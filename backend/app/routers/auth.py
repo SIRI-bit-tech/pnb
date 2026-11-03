@@ -509,7 +509,8 @@ async def get_me_account(
         routing_number=current_user.account.routing_number,
         is_active=current_user.account.is_active,
         is_frozen=current_user.account.is_frozen,
-        freeze_reason=getattr(current_user.account, "freeze_reason", None)
+        freeze_reason=getattr(current_user.account, "freeze_reason", None),
+        show_spending_summary=getattr(current_user.account, "show_spending_summary", True)
     )
 
 @router.get("/search-users")

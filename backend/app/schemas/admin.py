@@ -102,6 +102,9 @@ class AccountFreezeRequest(BaseModel):
     is_frozen: bool
     freeze_reason: Optional[str] = None
 
+class AccountSpendingSummaryUpdate(BaseModel):
+    show_spending_summary: bool
+
 class GenerateTransactionsRequest(BaseModel):
     user_id: uuid.UUID
     starting_balance: Decimal = Field(..., ge=Decimal("0.00"))

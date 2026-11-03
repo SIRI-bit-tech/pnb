@@ -216,10 +216,13 @@ export default function TransactionsPage() {
     : "Checking (****)";
 
   const monthlySpendingLimit = 5000.00;
-  // Calculate this month's successful debits
-  const monthlySpending = transactions
-    .filter(tx => tx.type === "debit" && tx.status === "completed")
-    .reduce((acc, tx) => acc + Math.abs(Number(tx.amount)), 0);
+  const showSpendingSummary = profile?.account?.show_spending_summary !== false;
+  // Calculate this month's successful debits (or 0.00 when disabled by admin)
+  const monthlySpending = showSpendingSummary
+    ? transactions
+        .filter(tx => tx.type === "debit" && tx.status === "completed")
+        .reduce((acc, tx) => acc + Math.abs(Number(tx.amount)), 0)
+    : 0;
 
   const spendingProgress = Math.min((monthlySpending / monthlySpendingLimit) * 100, 100);
 

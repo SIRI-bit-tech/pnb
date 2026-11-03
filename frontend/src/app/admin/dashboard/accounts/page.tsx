@@ -38,6 +38,7 @@ export default function AdminAccountsPage() {
   
   const [balanceForm, setBalanceForm] = useState({ checking: "", savings: "", credit: "" });
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
+  const [togglingSpendingUserId, setTogglingSpendingUserId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAccounts();
@@ -143,6 +144,55 @@ export default function AdminAccountsPage() {
   const toggleRow = (id: string, hasAccount: boolean) => {
     if (!hasAccount) return;
     setExpandedRowId(expandedRowId === id ? null : id);
+  };
+
+  const handleToggleSpendingSummary = async (u: any) => {
+    const token = localStorage.getItem("admin_session_token");
+    if (!token || !u.account) return;
+
+    const currentVal = u.account.show_spending_summary !== false;
+    const nextVal = !currentVal;
+    setTogglingSpendingUserId(u.id);
+
+    try {
+      const apiBase = getApiBase();
+      const res = await fetch(`${apiBase}/admin/accounts/${u.id}/spending-summary`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ show_spending_summary: nextVal }),
+      });
+
+      if (res.ok) {
+        setUsers((prev) =>
+          prev.map((item) =>
+            item.id === u.id
+              ? {
+                  ...item,
+                  account: {
+                    ...item.account,
+                    show_spending_summary: nextVal,
+                  },
+                }
+              : item
+          )
+        );
+        toast.success(
+          nextVal
+            ? "Last Two Months Spending enabled (shows actual amount)."
+            : "Last Two Months Spending turned off (shows $0.00)."
+        );
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.detail || "Failed to update spending display setting");
+      }
+    } catch (e: any) {
+      toast.error(e.message || "Failed to update spending display setting");
+    } finally {
+      setTogglingSpendingUserId(null);
+    }
   };
 
   if (loading) {
@@ -267,6 +317,41 @@ export default function AdminAccountsPage() {
                                 }`}
                               >
                                 {u.account.is_frozen ? <><Unlock className="w-4 h-4 mr-2" /> Unfreeze</> : <><Lock className="w-4 h-4 mr-2" /> Freeze</>}
+                              </button>
+                            </div>
+
+                            {/* Last Two Months Spending Toggle */}
+                            <div className="flex items-center justify-between gap-4 bg-white px-4 py-3 border border-zinc-200 rounded-xl">
+                              <div className="min-w-0">
+                                <span className="text-xs font-semibold text-zinc-900 block">
+                                  Last Two Months Spending
+                                </span>
+                                <span className="text-[11px] text-zinc-500 block">
+                                  {u.account.show_spending_summary !== false
+                                    ? "On — displays calculated spending amount"
+                                    : "Off — displays $0.00 on Transaction History"}
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                role="switch"
+                                aria-checked={u.account.show_spending_summary !== false}
+                                aria-label="Toggle Last Two Months Spending"
+                                disabled={togglingSpendingUserId === u.id}
+                                onClick={() => handleToggleSpendingSummary(u)}
+                                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent focus:outline-none disabled:opacity-50 ${
+                                  u.account.show_spending_summary !== false
+                                    ? "bg-purple-600"
+                                    : "bg-zinc-300"
+                                }`}
+                              >
+                                <span
+                                  className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200 motion-reduce:transition-none ${
+                                    u.account.show_spending_summary !== false
+                                      ? "translate-x-5"
+                                      : "translate-x-0"
+                                  }`}
+                                />
                               </button>
                             </div>
                           </div>

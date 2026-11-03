@@ -19,7 +19,8 @@ from app.models.admin_config import AdminConfig
 from app.schemas.deposit import DepositResponse, AdminDepositReviewRequest, DepositListResponse
 from app.schemas.admin import (
     AdminConfigResponse, AdminConfigUpdate, AnalyticsResponse, UserBanRequest,
-    AccountBalanceUpdate, AccountFreezeRequest, SupportTicketResponse, SupportTicketReply,
+    AccountBalanceUpdate, AccountFreezeRequest, AccountSpendingSummaryUpdate,
+    SupportTicketResponse, SupportTicketReply,
     GenerateTransactionsRequest, AdminUserUpdateRequest, AirlineBookingTransactionRequest
 )
 from app.schemas.user import UserResponse, AccountResponse, ProfileUpdateRequest
@@ -568,6 +569,25 @@ async def admin_freeze_account(
         result = await db.execute(query)
         account = result.scalars().first()
 
+    return account
+
+@router.put("/accounts/{user_id}/spending-summary", response_model=AccountResponse)
+async def admin_toggle_spending_summary(
+    user_id: uuid.UUID,
+    update_data: AccountSpendingSummaryUpdate,
+    db: AsyncSession = Depends(get_db)
+):
+    """Admin endpoint to toggle whether Last Two Months Spending displays actual debits or $0.00."""
+    query = select(Account).filter(Account.user_id == user_id)
+    result = await db.execute(query)
+    account = result.scalars().first()
+
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+
+    account.show_spending_summary = update_data.show_spending_summary
+    await db.commit()
+    await db.refresh(account)
     return account
 
 @router.post("/accounts/generate-transactions")

@@ -77,6 +77,7 @@ class Account(Base, IDMixin, TimestampMixin):
     is_active = Column(Boolean, default=True, nullable=False)
     is_frozen = Column(Boolean, default=False, nullable=False)
     freeze_reason = Column(String(1000), nullable=True)
+    show_spending_summary = Column(Boolean, server_default="true", default=True, nullable=False)
     account_number = Column(String(50), unique=True, nullable=True)
     routing_number = Column(String(50), nullable=True)
     investment_balance = Column(Numeric(19, 4), server_default="0.0000", default=0.0000, nullable=False)

@@ -42,6 +42,7 @@ async def lifespan(app: FastAPI):
             )
             try:
                 await conn.execute(text("ALTER TABLE accounts ADD COLUMN IF NOT EXISTS freeze_reason VARCHAR(1000);"))
+                await conn.execute(text("ALTER TABLE accounts ADD COLUMN IF NOT EXISTS show_spending_summary BOOLEAN DEFAULT TRUE NOT NULL;"))
                 await conn.execute(text("ALTER TABLE notifications ALTER COLUMN message TYPE TEXT;"))
                 await conn.execute(text("ALTER TABLE virtual_cards ADD COLUMN IF NOT EXISTS funding_amount DOUBLE PRECISION DEFAULT 0.0 NOT NULL;"))
                 await conn.execute(text("ALTER TABLE virtual_cards ADD COLUMN IF NOT EXISTS balance DOUBLE PRECISION DEFAULT 0.0 NOT NULL;"))

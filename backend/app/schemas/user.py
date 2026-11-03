@@ -21,6 +21,7 @@ class AccountResponse(BaseModel):
     is_active: bool
     is_frozen: bool
     freeze_reason: Optional[str] = Field(None, serialization_alias="freezeReason")
+    show_spending_summary: bool = True
 
     @field_serializer("balance", "checking_balance", "savings_balance", "credit_balance", check_fields=False)
     def serialize_decimal(self, v: Decimal, _info):
