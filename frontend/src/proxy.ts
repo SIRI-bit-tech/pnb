@@ -17,6 +17,9 @@ export default async function proxy(request: NextRequest): Promise<NextResponse>
 
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set("x-forwarded-host", request.headers.get("host") || "");
+    requestHeaders.delete("host");
+    requestHeaders.delete("connection");
+    requestHeaders.delete("content-length");
 
     try {
       const hasBody = !["GET", "HEAD"].includes(request.method);
@@ -29,7 +32,14 @@ export default async function proxy(request: NextRequest): Promise<NextResponse>
         redirect: "manual",
       });
 
+      // Node/Undici fetch automatically decompresses response.body, so strip
+      // encoding/length headers to prevent browser ERR_CONTENT_DECODING_FAILED.
       const responseHeaders = new Headers(response.headers);
+      responseHeaders.delete("content-encoding");
+      responseHeaders.delete("content-length");
+      responseHeaders.delete("transfer-encoding");
+      responseHeaders.delete("connection");
+
       return new NextResponse(response.body, {
         status: response.status,
         statusText: response.statusText,
