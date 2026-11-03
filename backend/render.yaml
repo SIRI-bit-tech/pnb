@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: prescott-national-bank-backend
+    env: python
+    region: oregon
+    plan: starter
+    buildCommand: "poetry install --only main"
+    startCommand: "./start.sh"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: POETRY_VERSION
+        value: 1.8.2
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "1440"
+      - key: ABLY_API_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: STYTCH_PROJECT_ID
+        sync: false
+      - key: STYTCH_SECRET
+        sync: false
+      - key: STYTCH_ENV
+        value: test
+      - key: UPLOADTHING_SECRET
+        sync: false
+      - key: UPLOADTHING_APP_ID
+        sync: false
+      - key: FRONTEND_URL
+        sync: false

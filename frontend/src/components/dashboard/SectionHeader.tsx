@@ -1,0 +1,21 @@
+import React from "react";
+
+interface SectionHeaderProps {
+  title: string;
+  subtitle?: string;
+  action?: React.ReactNode;
+}
+
+export default function SectionHeader({ title, subtitle, action }: SectionHeaderProps) {
+  return (
+    <div className="flex items-start justify-between gap-4 mb-6">
+      <div className="flex flex-col gap-1">
+        <h2 className="font-heading font-bold text-zinc-900 text-lg tracking-tight">{title}</h2>
+        {subtitle && (
+          <p className="text-xs text-zinc-500 leading-relaxed">{subtitle}</p>
+        )}
+      </div>
+      {action && <div className="flex-shrink-0">{action}</div>}
+    </div>
+  );
+}
