@@ -3,7 +3,11 @@
 import { Bell, LogOut, Menu } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 
-export default function AdminHeader() {
+export default function AdminHeader({
+  onMenuClick,
+}: {
+  onMenuClick?: () => void;
+}) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -29,6 +33,24 @@ export default function AdminHeader() {
       return {
         title: "Accounts & Balances",
         subtitle: "View checking/savings details and freeze/top up accounts"
+      };
+    }
+    if (pathname.startsWith("/admin/dashboard/cards")) {
+      return {
+        title: "Virtual Card Requests",
+        subtitle: "Review, approve, or manage customer virtual debit cards"
+      };
+    }
+    if (pathname.startsWith("/admin/dashboard/loans")) {
+      return {
+        title: "Loan Applications",
+        subtitle: "Review and process personal and commercial loan applications"
+      };
+    }
+    if (pathname.startsWith("/admin/dashboard/tax")) {
+      return {
+        title: "IRS Compliance",
+        subtitle: "Manage W-9 certifications, tax filings, and refund notifications"
       };
     }
     if (pathname.startsWith("/admin/dashboard/deposits")) {
@@ -65,8 +87,13 @@ export default function AdminHeader() {
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-4 lg:px-8 lg:py-6 bg-[#f9f9ff]/80 backdrop-blur-xl border-b border-zinc-200 lg:border-none">
-      {/* Mobile Menu Button - (Simplified for now) */}
-      <button className="lg:hidden p-2 -ml-2 text-zinc-600 rounded-xl hover:bg-black/5 mr-2">
+      {/* Mobile Menu Button */}
+      <button
+        type="button"
+        onClick={onMenuClick}
+        aria-label="Open navigation menu"
+        className="lg:hidden p-2 -ml-2 text-zinc-600 rounded-xl hover:bg-black/5 mr-2"
+      >
         <Menu className="w-5 h-5" />
       </button>
 
